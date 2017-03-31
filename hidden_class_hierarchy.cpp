@@ -16,7 +16,6 @@ namespace hidden_polymorphic
 
 }
 
-
 namespace hidden_nonpolymorphic
 {
 
