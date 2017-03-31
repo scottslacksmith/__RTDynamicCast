@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-namespace hidden
+namespace hidden_polymorphic
 {
 
   struct Base1;
@@ -14,3 +14,13 @@ namespace hidden
 
 };
 
+namespace hidden_nonpolymorphic
+{
+
+  struct Base;
+
+  struct Derived;
+
+  std::shared_ptr<Derived> get_derived();
+
+};

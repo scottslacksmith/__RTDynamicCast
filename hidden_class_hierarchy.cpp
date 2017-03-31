@@ -1,6 +1,6 @@
 #include "hidden_class_hierarchy.h"
 
-namespace hidden
+namespace hidden_polymorphic
 {
 
   struct Base1 { virtual ~Base1() = default; };
@@ -14,4 +14,19 @@ namespace hidden
     return { p , p.get() };
   }
 
-};
+}
+
+
+namespace hidden_nonpolymorphic
+{
+
+  struct Base {};
+
+  struct Derived : public Base {};
+
+  std::shared_ptr<Derived> get_derived()
+  {
+    return std::make_shared<Derived>();
+  }
+
+}

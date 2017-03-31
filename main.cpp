@@ -147,13 +147,13 @@ void test4()
 
 void test5()
 {
-  using namespace hidden;
+  using namespace hidden_polymorphic;
 
   std::pair<std::shared_ptr<Base2>, Derived *> p = get_base();
   Base2 * b2 = p.first.get();
   Derived * d = p.second;
 
-//  Derived * d11 = dynamic_cast<Derived *>(b2);
+//  Derived * x = dynamic_cast<Derived *>(b2);
   Derived * d1 = d;
   Derived * d2 = msvc_dynamic_cast<Derived *>(b2);
   std::cout << __FUNCTION__ << ((d1 != d2) ? " - OK" : " - Failed") << '\n';
