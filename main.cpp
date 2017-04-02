@@ -53,19 +53,22 @@ extern "C" PVOID __CLRCALL_OR_CDECL __RTDynamicCast(
 
 #endif
 
-template<typename CastToType, typename CastFromType>
-CastToType msvc_dynamic_cast(CastFromType srcPtr)
+template<typename TargetType, typename SrcType>
+TargetType RTDynamicCast(SrcType srcPtr)
 {
-  static_assert( std::is_pointer_v<CastFromType>, "Only pointers are supported by this implementation" );
+  using BaseSrcType = std::remove_pointer_t<SrcType>;
+  using BaseTargetType = std::remove_pointer_t<TargetType>;
+
+  static_assert( std::is_pointer_v<SrcType>, "Only pointers are supported by this implementation" );
 
   LONG virtualFuncOffet = 0;
-  PVOID srcTypeInfo = & const_cast<std::type_info&>(typeid(std::remove_pointer_t<CastFromType>));
-  PVOID targetTypeInfo = & const_cast<std::type_info&>(typeid(std::remove_pointer_t<CastToType>));
-  BOOL isReference = (std::is_pointer_v<CastFromType> ? FALSE : TRUE);
+  PVOID srcTypeInfo = & const_cast<std::type_info&>(typeid(BaseSrcType));
+  PVOID targetTypeInfo = & const_cast<std::type_info&>(typeid(BaseTargetType));
+  BOOL isReference = (std::is_pointer_v<SrcType> ? FALSE : TRUE);
 
   PVOID targetPtr = __RTDynamicCast(srcPtr, virtualFuncOffet, srcTypeInfo, targetTypeInfo, isReference);
 
-  return static_cast<CastToType>(targetPtr);
+  return static_cast<TargetType>(targetPtr);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -88,7 +91,7 @@ void test1()
   Base * b = d;
 
   Derived * d1 = dynamic_cast<Derived *>(b);
-  Derived * d2 = msvc_dynamic_cast<Derived *>(b);
+  Derived * d2 = RTDynamicCast<Derived *>(b);
   std::cout << __FUNCTION__ << ((d1 == d2) ? " - OK" : " - Failed") << '\n';
 }
 
@@ -101,7 +104,7 @@ void test2()
   Base * b = d;
 
   Derived * d1 = dynamic_cast<Derived *>(b);
-  Derived const * d2 = msvc_dynamic_cast<Derived const *>(b);
+  Derived const * d2 = RTDynamicCast<Derived const *>(b);
   std::cout << __FUNCTION__ << ((d1 == d2) ? " - OK" : " - Failed") << '\n';
 }
 
@@ -126,7 +129,7 @@ void test3()
   Base1 * b1 = d;
   
   Derived * d1 = dynamic_cast<Derived *>(b1);
-  Derived * d2 = msvc_dynamic_cast<Derived *>(b1);
+  Derived * d2 = RTDynamicCast<Derived *>(b1);
   std::cout << __FUNCTION__ << ((d1 == d2) ? " - OK" : " - Failed") << '\n';
 }
 
@@ -139,7 +142,7 @@ void test4()
   Base2 * b2 = d;
 
   Derived * d1 = dynamic_cast<Derived *>(b2);
-  Derived * d2 = msvc_dynamic_cast<Derived *>(b2);
+  Derived * d2 = RTDynamicCast<Derived *>(b2);
   std::cout << __FUNCTION__ << ((d1 == d2) ? " - OK" : " - Failed") << '\n';
 }
 
@@ -155,8 +158,8 @@ void test5()
 
 //  Derived * x = dynamic_cast<Derived *>(b2);
   Derived * d1 = d;
-  Derived * d2 = msvc_dynamic_cast<Derived *>(b2);
-  std::cout << __FUNCTION__ << ((d1 != d2) ? " - OK" : " - Failed") << '\n';
+  Derived * d2 = RTDynamicCast<Derived *>(b2);
+  std::cout << __FUNCTION__ << ((d1 == d2) ? " - OK" : " - Failed") << '\n';
 }
 
 //---------------------------------------------------------------------------------------------------------------------
